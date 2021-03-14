@@ -9,17 +9,27 @@ GAME RULES:
 */
 const $score0el = document.getElementById('score--0');
 const $score1el = document.getElementById('score--1');
-// const $current0el = document.getElementById('current--0');
-// const $current1el = document.getElementById('current--1');
+const $player0el = document.querySelector('.player--0');
+const $player1el = document.querySelector('.player--1');
 const $diceImg = document.querySelector('.dice');
 const $btnRoll = document.querySelector('.btn--roll');
+const $btnHold = document.querySelector('.btn--hold');
 
 $score0el.textContent = 0;
 $score1el.textContent = 0;
 $diceImg.classList.add('hidden');
 
-let activeScore = 0;
-let sum = 0;
+const scores = [0, 0];
+let activePlayer = 0;
+let currentScore = 0;
+
+const switchPlayer = () => {
+  document.getElementById(`current--${activePlayer}`).textContent = 0;
+  currentScore = 0;
+  activePlayer = activePlayer === 0 ? 1 : 0;
+  $player0el.classList.toggle('player--active');
+  $player1el.classList.toggle('player--active');
+};
 
 $btnRoll.addEventListener('click', function () {
   const randomDice = Math.trunc(Math.random() * 6 + 1);
@@ -27,9 +37,31 @@ $btnRoll.addEventListener('click', function () {
   if (randomDice > 1) {
     $diceImg.src = `./images/dice-${randomDice}.png`;
     $diceImg.classList.remove('hidden');
-    sum += randomDice;
-    document.getElementById(`current--${activeScore}`).textContent = sum;
+    currentScore += randomDice;
+    document.getElementById(
+      `current--${activePlayer}`
+    ).textContent = currentScore;
   } else {
     // Switch Player
+    switchPlayer();
+  }
+});
+
+$btnHold.addEventListener('click', function () {
+  scores[activePlayer] += currentScore;
+  console.log('currentScore', currentScore);
+  console.log('score[activePlayer]', scores[activePlayer]);
+  document.getElementById(`score--${activePlayer}`).textContent =
+    scores[activePlayer];
+  if (scores[activePlayer] >= 20) {
+    document
+      .querySelector(`.player--${activePlayer}`)
+      .classList.add('player--winner');
+    document
+      .querySelector(`.player--${activePlayer}`)
+      .classList.remove('player--active');
+    $diceImg.style.display = 'hidden';
+  } else {
+    switchPlayer();
   }
 });
